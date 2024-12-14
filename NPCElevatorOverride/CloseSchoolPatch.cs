@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using TheNPCElevator.NPCElevatorClasses;
 using UnityEngine;
+using MTM101BaldAPI.Registers;
 
 namespace TheNPCElevator.NPCElevatorOverride
 {
@@ -17,14 +18,11 @@ namespace TheNPCElevator.NPCElevatorOverride
 
 			foreach (var npc in __instance.ec.Npcs) 
 			{
-				if (npc.Navigator.enabled && !CannotLeaveSchool(npc))
+				if (npc.Navigator.enabled && npc.GetMeta().tags.Contains("student")) // If it is a student
 				{
 					npc.behaviorStateMachine.ChangeNavigationState(new NavigationState_GoToNPCElevator(npc, potentialElevators[Random.Range(0, potentialElevators.Length)]));
 				}
 			}
         }
-
-		static bool CannotLeaveSchool(NPC npc) =>
-			npc.Character == Character.Principal || npc.Character == Character.Baldi; // Mods can patch this bool to tell whether their custom npcs can go or not (for example, BB Times has replacement characters for Principal)
     }
 }
