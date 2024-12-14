@@ -31,14 +31,14 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (close)
             {
                 openState = false;
-                //if (IsFullyOpened)
-                //	audMan.PlaySingle(audClose);
-                return;
+				if (IsFullyOpened)
+					audMan.PlaySingle(audClose);
+				return;
             }
             openState = true;
-            //if (IsFullyClosed)
-            //	audMan.PlaySingle(audOpen);
-        }
+			if (IsFullyClosed)
+				audMan.PlaySingle(audOpen);
+		}
 
         void TryDespawnNPC(NPC npc)
         {
@@ -63,11 +63,11 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (!initialized)
                 return;
 
-            //frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * 3.5f;
-            //frame = Mathf.Clamp(frame, 0, sprElvs.Length - 1);
+			frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * 3.5f;
+			frame = Mathf.Clamp(frame, 0, sprElvs.Length - 1);
 
-            //sprRenderer.sprite = sprElvs[Mathf.FloorToInt(frame)];
-        }
+			sprRenderer.sprite = sprElvs[Mathf.FloorToInt(frame)];
+		}
 
         IEnumerator CollectNPC()
         {

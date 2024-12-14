@@ -41,10 +41,9 @@ namespace TheNPCElevator
 			var elObj = new GameObject("Structure_NPCElevator");
 			npcElevatorPrefab = elObj.gameObject.AddComponent<Structure_NPCElevator>();
 
-			var nullRoom = Resources.FindObjectsOfTypeAll<EnvironmentController>()[0].nullRoom; // Placeholder
-			npcElevatorPrefab.wallTex = nullRoom.wallTex;
-			npcElevatorPrefab.floorTex = nullRoom.florTex;
-			npcElevatorPrefab.ceilingTex = nullRoom.ceilTex;
+			npcElevatorPrefab.wallTex = AssemblyExtensions.LoadTextureFromResources("wall.png");
+			npcElevatorPrefab.floorTex = AssemblyExtensions.LoadTextureFromResources("floor.png");
+			npcElevatorPrefab.ceilingTex = AssemblyExtensions.LoadTextureFromResources("ceil.png");
 
 			elObj.ConvertToPrefab(true);
 
@@ -64,6 +63,8 @@ namespace TheNPCElevator
 			npcEl.audOpen = elevatorRef.audDoorOpen;
 
 			npcEl.sprRenderer = elRenderer;
+
+			npcEl.sprElvs = AssetLoader.SpritesFromSpritesheet(5, 1, 25f, Vector2.one * 0.5f, AssemblyExtensions.LoadTextureFromResources("elevator.png"));
 
 			npcElevatorPrefab.npcElevatorPre = npcEl;
 		}

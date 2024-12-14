@@ -10,6 +10,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ModResources\ceil.jpg" />
+    <None Remove="ModResources\ceil.png" />
+    <None Remove="ModResources\elevator.png" />
+    <None Remove="ModResources\floor.jpg" />
+    <None Remove="ModResources\floor.png" />
+    <None Remove="ModResources\wall.jpg" />
+    <None Remove="ModResources\wall.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ModResources\ceil.png" />
+    <EmbeddedResource Include="ModResources\elevator.png" />
+    <EmbeddedResource Include="ModResources\floor.png" />
+    <EmbeddedResource Include="ModResources\wall.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
