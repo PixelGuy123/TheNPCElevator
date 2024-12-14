@@ -6,11 +6,14 @@ using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Registers;
 using System.Collections;
 using UnityEngine;
+using PixelInternalAPI.Extensions;
+using TheNPCElevator.NPCElevatorClasses;
 
 namespace TheNPCElevator
 {
-	[BepInPlugin(guid, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(guid, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 	[BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)]
+	[BepInDependency("pixelguy.pixelmodding.baldiplus.pixelinternalapi", BepInDependency.DependencyFlags.HardDependency)]
 	public class Plugin : BaseUnityPlugin
 	{
 		internal const string guid = "pixelguy.pixelmodding.baldiplus.thenpcelevator";
@@ -19,7 +22,6 @@ namespace TheNPCElevator
 		private void Awake()
 		{
 			ModPath = AssetLoader.GetModPath(this);
-
 			Harmony h = new(guid);
 			h.PatchAll();
 			logger = Logger;
@@ -45,12 +47,34 @@ namespace TheNPCElevator
 			npcElevatorPrefab.ceilingTex = nullRoom.ceilTex;
 
 			elObj.ConvertToPrefab(true);
+
+			var npcElObj = ObjectCreationExtensions.CreateSpriteBillboard(null, false).AddSpriteHolder(out var elRenderer, new Vector3(5f, 5f, 0f), 0);
+			npcElObj.name = "NPCElevator";
+			elRenderer.name = "NpcElevatorRenderer";
+			npcElObj.gameObject.ConvertToPrefab(true);
+
+			var collider = npcElObj.gameObject.AddComponent<BoxCollider>();
+			collider.size = Vector3.one * 10f; // Nobody can go in, literally
+
+			var elevatorRef = GenericExtensions.FindResourceObject<ElevatorDoor>();
+
+			var npcEl = npcElObj.gameObject.AddComponent<NPCElevator>();
+			npcEl.audMan = npcEl.gameObject.CreatePropagatedAudioManager(45f, 75f);
+			npcEl.audClose = elevatorRef.audDoorShut;
+			npcEl.audOpen = elevatorRef.audDoorOpen;
+
+			npcEl.sprRenderer = elRenderer;
+
+			npcElevatorPrefab.npcElevatorPre = npcEl;
 		}
 
 		void AddBuilderToLevelObjects(string lvlName, int lvlNum, SceneObject sceneObject)
 		{
 			var ld = sceneObject.levelObject;
 			if (!ld) return;
+
+			ld.MarkAsNeverUnload();
+			ld.timeLimit = 5;
 
 			switch (lvlName)
 			{
