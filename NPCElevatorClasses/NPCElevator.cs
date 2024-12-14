@@ -18,7 +18,7 @@ namespace TheNPCElevator.NPCElevatorClasses
             npc.enabled = false;
 			npc.Navigator.enabled = false;
 			npc.Navigator.Entity.SetFrozen(true);
-            npc.Navigator.Entity.Teleport(ec.CellFromPosition(position).FloorWorldPosition + new Vector3(Random.Range(-offsetForTile.x, offsetForTile.x), 0, Random.Range(-offsetForTile.x, offsetForTile.x)));
+			StartCoroutine(NPCEnterInterpolated(npc));
             ec.Npcs.Remove(npc);
             npcsToDestroy.Add(npc);
 
@@ -91,6 +91,24 @@ namespace TheNPCElevator.NPCElevatorClasses
                 npcsToDestroy.RemoveAt(0);
             }
         }
+
+		IEnumerator NPCEnterInterpolated(NPC npc)
+		{
+			Vector3 posOfNpc = npc.transform.position,
+				target = ec.CellFromPosition(position).FloorWorldPosition + new Vector3(Random.Range(-offsetForTile.x, offsetForTile.x), 0, Random.Range(-offsetForTile.x, offsetForTile.x));
+			float t = 0, speed = 3f;
+			if (npc.Navigator.Entity.Velocity != null)
+				speed = Mathf.Max(speed, npc.Navigator.Entity.Velocity.magnitude * 0.75f);
+
+			while (t < 1f)
+			{
+				t += ec.EnvironmentTimeScale * Time.deltaTime * speed;
+				if (t >= 1f)
+					t = 1f;
+				npc.Navigator.Entity.Teleport(Vector3.Lerp(posOfNpc, target, t));
+				yield return null;
+			}
+		}
 
         [SerializeField]
         internal Sprite[] sprElvs = [];
