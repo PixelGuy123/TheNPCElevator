@@ -10,7 +10,7 @@ namespace TheNPCElevator.NPCElevatorOverride
 		[HarmonyPostfix]
         static void ClosingSchoolForNPCs(TimeOut __instance)
         {
-			Debug.Log("Closing school! So goes to the npcs!");
+			//Debug.Log("Closing school! So goes to the npcs!");
 			var potentialElevators = Object.FindObjectsOfType<NPCElevator>();
 			if (potentialElevators.Length == 0)
 				return;

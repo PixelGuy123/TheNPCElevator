@@ -16,6 +16,8 @@ namespace TheNPCElevator.NPCElevatorClasses
         public void DespawnNPC(NPC npc)
         {
             npc.enabled = false;
+			npc.Navigator.enabled = false;
+			npc.Navigator.Entity.SetFrozen(true);
             npc.Navigator.Entity.Teleport(ec.CellFromPosition(position).FloorWorldPosition + new Vector3(Random.Range(-offsetForTile.x, offsetForTile.x), 0, Random.Range(-offsetForTile.x, offsetForTile.x)));
             ec.Npcs.Remove(npc);
             npcsToDestroy.Add(npc);
@@ -103,7 +105,7 @@ namespace TheNPCElevator.NPCElevatorClasses
         internal SpriteRenderer sprRenderer;
 
         [SerializeField]
-        internal Vector2 offsetForTile = Vector2.one * 7f;
+        internal Vector2 offsetForTile = Vector2.one * 2.5f;
 
         [SerializeField]
         internal float delayToClose = 5f;
