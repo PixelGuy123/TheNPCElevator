@@ -47,9 +47,10 @@ namespace TheNPCElevator
 
 			elObj.ConvertToPrefab(true);
 
-			var npcElObj = ObjectCreationExtensions.CreateSpriteBillboard(null, false).AddSpriteHolder(out var elRenderer, new Vector3(5f, 5f, 0f), 0);
+			var npcElObj = ObjectCreationExtensions.CreateSpriteBillboard(null, false).AddSpriteHolder(out var elRenderer, new Vector3(0f, 5f, 5f), 0);
 			npcElObj.name = "NPCElevator";
 			elRenderer.name = "NpcElevatorRenderer";
+			elRenderer.transform.localScale = new(0.976f, 1f, 1f);
 			npcElObj.gameObject.ConvertToPrefab(true);
 
 			var collider = npcElObj.gameObject.AddComponent<BoxCollider>();
@@ -58,7 +59,7 @@ namespace TheNPCElevator
 			var elevatorRef = GenericExtensions.FindResourceObject<ElevatorDoor>();
 
 			var npcEl = npcElObj.gameObject.AddComponent<NPCElevator>();
-			npcEl.audMan = npcEl.gameObject.CreatePropagatedAudioManager(45f, 75f);
+			npcEl.audMan = elRenderer.gameObject.CreatePropagatedAudioManager(45f, 75f);
 			npcEl.audClose = elevatorRef.audDoorShut;
 			npcEl.audOpen = elevatorRef.audDoorOpen;
 

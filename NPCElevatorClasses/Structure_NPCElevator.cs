@@ -32,6 +32,7 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (finalSpots.Count == 0)
             {
                 Debug.LogWarning("Structure_NPCElevator failed to find any potential spots for the elevators.");
+				Finished();
                 return;
             }
 

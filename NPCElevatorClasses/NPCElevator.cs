@@ -63,7 +63,7 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (!initialized)
                 return;
 
-			frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * 3.5f;
+			frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * elevatorMoveSpeed;
 			frame = Mathf.Clamp(frame, 0, sprElvs.Length - 1);
 
 			sprRenderer.sprite = sprElvs[Mathf.FloorToInt(frame)];
@@ -123,10 +123,10 @@ namespace TheNPCElevator.NPCElevatorClasses
         internal SpriteRenderer sprRenderer;
 
         [SerializeField]
-        internal Vector2 offsetForTile = Vector2.one * 2.5f;
+        internal Vector2 offsetForTile = Vector2.one * 1.5f;
 
         [SerializeField]
-        internal float delayToClose = 5f;
+        internal float delayToClose = 5f, elevatorMoveSpeed = 12f;
 
         readonly List<NPC> npcsToDestroy = [];
         Coroutine collectNpcCorou;
