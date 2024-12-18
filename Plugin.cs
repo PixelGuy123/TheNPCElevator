@@ -76,7 +76,7 @@ namespace TheNPCElevator
 			if (!ld) return;
 
 			ld.MarkAsNeverUnload();
-			ld.timeLimit = 5;
+			//ld.timeLimit = 5;
 
 			switch (lvlName)
 			{
