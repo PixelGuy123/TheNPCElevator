@@ -18,7 +18,7 @@ namespace TheNPCElevator.NPCElevatorOverride
 
 			foreach (var npc in __instance.ec.Npcs) 
 			{
-				if (npc.Navigator.enabled && npc.GetMeta().tags.Contains("student")) // If it is a student
+				if (npc.Navigator.enabled && (npc.GetMeta()?.tags.Contains("student") ?? false)) // If it is a student
 				{
 					npc.behaviorStateMachine.ChangeNavigationState(new NavigationState_GoToNPCElevator(npc, potentialElevators[Random.Range(0, potentialElevators.Length)]));
 				}
