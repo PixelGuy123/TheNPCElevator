@@ -8,6 +8,8 @@ using System.Collections;
 using UnityEngine;
 using PixelInternalAPI.Extensions;
 using TheNPCElevator.NPCElevatorClasses;
+using System.IO;
+using System.Collections.Generic;
 
 namespace TheNPCElevator
 {
@@ -27,6 +29,76 @@ namespace TheNPCElevator
 			logger = Logger;
 
 			LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
+			//LoadingEvents.RegisterOnAssetsLoaded(Info, () =>
+			//{
+			//	var gen = Instantiate(Resources.FindObjectsOfTypeAll<TextTextureGenerator>()[0]);
+			//	HashSet<PosterObject> seenPosters = [];
+			//	foreach (var npc in NPCMetaStorage.Instance.All())
+			//	{
+
+			//		foreach (var npcVal in npc.prefabs)
+			//		{
+			//			if (npcVal.Value && npcVal.Value.Poster && seenPosters.Add(npcVal.Value.Poster))
+			//			{
+			//				try
+			//				{
+			//					SaveTextureAsPNG(gen.GenerateTextTexture(npcVal.Value.Poster), npcVal.Key + ".png");
+			//				}
+			//				catch (System.Exception e)
+			//				{
+			//					Debug.LogWarning("======== Failed to load texture from NPC: " + npcVal.Key + " ===============");
+			//					Debug.LogException(e);
+			//				}
+			//			}
+			//		}
+			//	}
+			//	Destroy(gen.gameObject);
+
+			//	static void SaveTextureAsPNG(Texture2D texture, string fileName)
+			//	{
+			//		if (texture == null)
+			//		{
+			//			Debug.LogError("Cannot save null texture");
+			//			return;
+			//		}
+
+			//		// Ensure the texture is readable
+			//		if (!texture.isReadable)
+			//		{
+			//			Debug.LogError("Texture is not readable. Enable Read/Write in import settings.");
+			//			return;
+			//		}
+
+			//		try
+			//		{
+			//			// Convert texture to PNG bytes
+			//			byte[] pngData = texture.EncodeToPNG();
+			//			if (pngData == null || pngData.Length == 0)
+			//			{
+			//				Debug.LogError("Failed to convert texture to PNG");
+			//				return;
+			//			}
+
+			//			// Construct full save path
+			//			string savePath = Path.Combine(Application.streamingAssetsPath, "exportedPNGs", fileName);
+
+			//			string directory = Path.GetDirectoryName(savePath);
+			//			if (!Directory.Exists(directory))
+			//			{
+			//				Directory.CreateDirectory(directory);
+			//			}
+
+			//			// Save file
+			//			File.WriteAllBytes(savePath, pngData);
+			//			Debug.Log($"Saved PNG to: {savePath}");
+			//		}
+			//		catch (System.Exception e)
+			//		{
+			//			Debug.LogError($"Failed to save PNG: {e.Message}");
+			//		}
+			//	}
+
+			//}, true);
 
 			GeneratorManagement.Register(this, GenerationModType.Addend, AddBuilderToLevelObjects);
 
