@@ -10,15 +10,17 @@ namespace TheNPCElevator.NPCElevatorClasses
         {
             dir = spawnDir;
             this.position = position;
+            frontPos = position + spawnDir.ToIntVector2();
+            elevatorPositions.Add(new(frontPos, position));
             initialized = true;
         }
 
         public void DespawnNPC(NPC npc)
         {
             npc.enabled = false;
-			npc.Navigator.enabled = false;
-			npc.Navigator.Entity.SetFrozen(true);
-			StartCoroutine(NPCEnterInterpolated(npc));
+            npc.Navigator.enabled = false;
+            npc.Navigator.Entity.SetFrozen(true);
+            StartCoroutine(NPCEnterInterpolated(npc));
             ec.Npcs.Remove(npc);
             npcsToDestroy.Add(npc);
 
@@ -31,14 +33,14 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (close)
             {
                 openState = false;
-				if (IsFullyOpened)
-					audMan.PlaySingle(audClose);
-				return;
+                if (IsFullyOpened)
+                    audMan.PlaySingle(audClose);
+                return;
             }
             openState = true;
-			if (IsFullyClosed)
-				audMan.PlaySingle(audOpen);
-		}
+            if (IsFullyClosed)
+                audMan.PlaySingle(audOpen);
+        }
 
         void TryDespawnNPC(NPC npc)
         {
@@ -63,11 +65,11 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (!initialized)
                 return;
 
-			frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * elevatorMoveSpeed;
-			frame = Mathf.Clamp(frame, 0, sprElvs.Length - 1);
+            frame += (openState ? 1f : -1f) * ec.EnvironmentTimeScale * Time.deltaTime * elevatorMoveSpeed;
+            frame = Mathf.Clamp(frame, 0, sprElvs.Length - 1);
 
-			sprRenderer.sprite = sprElvs[Mathf.FloorToInt(frame)];
-		}
+            sprRenderer.sprite = sprElvs[Mathf.FloorToInt(frame)];
+        }
 
         IEnumerator CollectNPC()
         {
@@ -92,23 +94,31 @@ namespace TheNPCElevator.NPCElevatorClasses
             }
         }
 
-		IEnumerator NPCEnterInterpolated(NPC npc)
-		{
-			Vector3 posOfNpc = npc.transform.position,
-				target = ec.CellFromPosition(position).FloorWorldPosition + new Vector3(Random.Range(-offsetForTile.x, offsetForTile.x), 0, Random.Range(-offsetForTile.x, offsetForTile.x));
-			float t = 0, speed = 3f;
-			if (npc.Navigator.Entity.Velocity != null)
-				speed = Mathf.Max(speed, npc.Navigator.Entity.Velocity.magnitude * 0.75f);
+        IEnumerator NPCEnterInterpolated(NPC npc)
+        {
+            Vector3 posOfNpc = npc.transform.position,
+                target = ec.CellFromPosition(position).FloorWorldPosition + new Vector3(Random.Range(-offsetForTile.x, offsetForTile.x), 0, Random.Range(-offsetForTile.x, offsetForTile.x));
+            float t = 0, speed = 3f;
+            if (npc.Navigator.Entity.Velocity != null)
+                speed = Mathf.Max(speed, npc.Navigator.Entity.Velocity.magnitude * 0.75f);
 
-			while (t < 1f)
-			{
-				t += ec.EnvironmentTimeScale * Time.deltaTime * speed;
-				if (t >= 1f)
-					t = 1f;
-				npc.Navigator.Entity.Teleport(Vector3.Lerp(posOfNpc, target, t));
-				yield return null;
-			}
-		}
+            while (t < 1f)
+            {
+                t += ec.EnvironmentTimeScale * Time.deltaTime * speed;
+                if (t >= 1f)
+                    t = 1f;
+                npc.Navigator.Entity.Teleport(Vector3.Lerp(posOfNpc, target, t));
+                yield return null;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (initialized)
+                elevatorPositions.RemoveAll(kvp => kvp.Key == frontPos);
+        }
+
+        public static List<KeyValuePair<IntVector2, IntVector2>> elevatorPositions = [];
 
         [SerializeField]
         internal Sprite[] sprElvs = [];
@@ -132,12 +142,13 @@ namespace TheNPCElevator.NPCElevatorClasses
         Coroutine collectNpcCorou;
 
         Direction dir;
-        IntVector2 position;
+        IntVector2 position, frontPos;
         float frame = 0f;
         bool openState = false, initialized = false;
 
         public bool IsFullyClosed => frame == 0f;
         public bool IsFullyOpened => frame == sprElvs.Length - 1;
-        public Cell TargettingSpot => ec.CellFromPosition(position + dir.ToIntVector2());
+        public Cell TargettingSpot => ec.CellFromPosition(frontPos);
+        public IntVector2 Position => position;
     }
 }

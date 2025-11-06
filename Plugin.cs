@@ -1,19 +1,17 @@
-﻿using BepInEx;
+﻿using System.Collections;
+using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Registers;
-using System.Collections;
-using UnityEngine;
 using PixelInternalAPI.Extensions;
 using TheNPCElevator.NPCElevatorClasses;
-using System.IO;
-using System.Collections.Generic;
+using UnityEngine;
 
 namespace TheNPCElevator
 {
-    [BepInPlugin(guid, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+	[BepInPlugin(guid, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 	[BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("pixelguy.pixelmodding.baldiplus.pixelinternalapi", BepInDependency.DependencyFlags.HardDependency)]
 	public class Plugin : BaseUnityPlugin
@@ -28,77 +26,7 @@ namespace TheNPCElevator
 			h.PatchAll();
 			logger = Logger;
 
-			LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
-			//LoadingEvents.RegisterOnAssetsLoaded(Info, () =>
-			//{
-			//	var gen = Instantiate(Resources.FindObjectsOfTypeAll<TextTextureGenerator>()[0]);
-			//	HashSet<PosterObject> seenPosters = [];
-			//	foreach (var npc in NPCMetaStorage.Instance.All())
-			//	{
-
-			//		foreach (var npcVal in npc.prefabs)
-			//		{
-			//			if (npcVal.Value && npcVal.Value.Poster && seenPosters.Add(npcVal.Value.Poster))
-			//			{
-			//				try
-			//				{
-			//					SaveTextureAsPNG(gen.GenerateTextTexture(npcVal.Value.Poster), npcVal.Key + ".png");
-			//				}
-			//				catch (System.Exception e)
-			//				{
-			//					Debug.LogWarning("======== Failed to load texture from NPC: " + npcVal.Key + " ===============");
-			//					Debug.LogException(e);
-			//				}
-			//			}
-			//		}
-			//	}
-			//	Destroy(gen.gameObject);
-
-			//	static void SaveTextureAsPNG(Texture2D texture, string fileName)
-			//	{
-			//		if (texture == null)
-			//		{
-			//			Debug.LogError("Cannot save null texture");
-			//			return;
-			//		}
-
-			//		// Ensure the texture is readable
-			//		if (!texture.isReadable)
-			//		{
-			//			Debug.LogError("Texture is not readable. Enable Read/Write in import settings.");
-			//			return;
-			//		}
-
-			//		try
-			//		{
-			//			// Convert texture to PNG bytes
-			//			byte[] pngData = texture.EncodeToPNG();
-			//			if (pngData == null || pngData.Length == 0)
-			//			{
-			//				Debug.LogError("Failed to convert texture to PNG");
-			//				return;
-			//			}
-
-			//			// Construct full save path
-			//			string savePath = Path.Combine(Application.streamingAssetsPath, "exportedPNGs", fileName);
-
-			//			string directory = Path.GetDirectoryName(savePath);
-			//			if (!Directory.Exists(directory))
-			//			{
-			//				Directory.CreateDirectory(directory);
-			//			}
-
-			//			// Save file
-			//			File.WriteAllBytes(savePath, pngData);
-			//			Debug.Log($"Saved PNG to: {savePath}");
-			//		}
-			//		catch (System.Exception e)
-			//		{
-			//			Debug.LogError($"Failed to save PNG: {e.Message}");
-			//		}
-			//	}
-
-			//}, true);
+			LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), LoadingEventOrder.Pre);
 
 			GeneratorManagement.Register(this, GenerationModType.Addend, AddBuilderToLevelObjects);
 
@@ -144,51 +72,25 @@ namespace TheNPCElevator
 
 		void AddBuilderToLevelObjects(string lvlName, int lvlNum, SceneObject sceneObject)
 		{
-			var ld = sceneObject.levelObject;
-			if (!ld) return;
-
-			ld.MarkAsNeverUnload();
-			//ld.timeLimit = 5;
-
-			switch (lvlName)
+			foreach (var ld in sceneObject.GetCustomLevelObjects())
 			{
-				case "F1":
-					ld.forcedStructures = ld.forcedStructures.AddToArray(new()
+				if (!ld.timeOutEvent || ld.IsModifiedByMod(Info)) return;
+				ld.MarkAsNeverUnload();
+				ld.MarkAsModifiedByMod(Info);
+				ld.forcedStructures = ld.forcedStructures.AddToArray(new()
+				{
+					prefab = npcElevatorPrefab,
+					parameters = new()
 					{
-						prefab = npcElevatorPrefab,
-						parameters = new()
-						{
-							minMax = [new(1, 1)]
-						}
-					});
-					return;
-
-				case "F2":
-					ld.forcedStructures = ld.forcedStructures.AddToArray(new()
-					{
-						prefab = npcElevatorPrefab,
-						parameters = new()
-						{
-							minMax = [new(1, 3)]
-						}
-					});
-					return;
-
-				case "F3":
-					ld.forcedStructures = ld.forcedStructures.AddToArray(new()
-					{
-						prefab = npcElevatorPrefab,
-						parameters = new()
-						{
-							minMax = [new(2, 5)]
-						}
-					});
-					return;
+						minMax = [new(1, 1 + lvlNum)]
+					}
+				});
 			}
+
 		}
 
 		Structure_NPCElevator npcElevatorPrefab;
-    }
+	}
 
 	//[HarmonyPatch]
 	//internal class Finalizers

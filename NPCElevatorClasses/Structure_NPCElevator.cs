@@ -32,7 +32,7 @@ namespace TheNPCElevator.NPCElevatorClasses
             if (finalSpots.Count == 0)
             {
                 Debug.LogWarning("Structure_NPCElevator failed to find any potential spots for the elevators.");
-				Finished();
+                Finished();
                 return;
             }
 
@@ -62,8 +62,7 @@ namespace TheNPCElevator.NPCElevatorClasses
                 npcEl.Ec = ec;
                 npcEl.transform.position = cell.FloorWorldPosition;
                 npcEl.transform.rotation = finalDirections[idx].ToRotation();
-				npcEl.Initialize(finalDirections[idx], finalSpots[idx]);
-
+                npcEl.Initialize(finalDirections[idx], finalSpots[idx]);
 
                 finalSpots.RemoveAt(idx);
                 finalDirections.RemoveAt(idx);
@@ -72,15 +71,7 @@ namespace TheNPCElevator.NPCElevatorClasses
             Finished();
         }
 
-        public override void Load(List<StructureData> data)
-        {
-            base.Load(data);
-            // Not really much, since you cannot create cells (or room controllers) from here
-
-            Finished();
-        }
-
-        RoomController CreateElevatorRoom(LevelGenerator lg, IntVector2 position, Direction dir)
+        RoomController CreateElevatorRoom(LevelBuilder lg, IntVector2 position, Direction dir)
         {
             var elevatorRoom = Instantiate(lg.roomControllerPre, ec.transform);
             elevatorRoom.name = "NPCElevator_RoomController_" + (++roomId);
